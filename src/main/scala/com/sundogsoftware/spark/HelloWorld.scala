@@ -18,3 +18,5 @@ object HelloWorld {
     sc.stop()
   }
 }
+
+//spark-submit --class com.sundogsoftware.spark.HelloWorld  target/scala-2.12/sparkscalacourse_2.12-0.1.jar
