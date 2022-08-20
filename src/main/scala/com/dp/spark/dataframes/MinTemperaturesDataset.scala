@@ -1,9 +1,9 @@
-package com.dp.spark
+package com.dp.spark.dataframes
 
-import org.apache.spark.sql.types.{FloatType, IntegerType, StringType, StructType}
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.round
+import org.apache.spark.sql.types.{FloatType, IntegerType, StringType, StructType}
 
 /** Find the minimum temperature by weather station */
 object MinTemperaturesDataset {
@@ -12,7 +12,7 @@ object MinTemperaturesDataset {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -35,13 +35,13 @@ object MinTemperaturesDataset {
       .schema(temperatureSchema)
       .csv("data/1800.csv")
       .as[Temperature]
-    
+
     // Filter out all but TMIN entries
     val minTemps = ds.filter($"measure_type" === "TMIN")
-    
+
     // Select only stationID and temperature)
     val stationTemps = minTemps.select("stationID", "temperature")
-    
+
     // Aggregate to find minimum temperature for every station
     val minTempsByStation = stationTemps.groupBy("stationID").min("temperature")
 
@@ -52,12 +52,12 @@ object MinTemperaturesDataset {
 
     // Collect, format, and print the results
     val results = minTempsByStationF.collect()
-    
+
     for (result <- results) {
-       val station = result(0)
-       val temp = result(1).asInstanceOf[Float]
-       val formattedTemp = f"$temp%.2f F"
-       println(s"$station minimum temperature: $formattedTemp")
+      val station = result(0)
+      val temp = result(1).asInstanceOf[Float]
+      val formattedTemp = f"$temp%.2f F"
+      println(s"$station minimum temperature: $formattedTemp")
     }
   }
 }

@@ -1,8 +1,8 @@
-package com.dp.spark
+package com.dp.spark.dataframes
 
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{avg, round}
 
 /** Compute the average number of friends by age in a social network. */
 object FriendsByAgeDataset {
@@ -12,7 +12,7 @@ object FriendsByAgeDataset {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -49,4 +49,3 @@ object FriendsByAgeDataset {
       .alias("friends_avg")).sort("age").show()
   }
 }
-  

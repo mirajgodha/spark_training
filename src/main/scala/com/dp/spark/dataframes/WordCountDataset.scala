@@ -1,8 +1,8 @@
-package com.dp.spark
+package com.dp.spark.dataframes
 
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{explode, split}
 
 /** Count up how many of each word appears in a book as simply as possible. */
 object WordCountDataset {
@@ -11,7 +11,7 @@ object WordCountDataset {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -39,4 +39,3 @@ object WordCountDataset {
     wordCounts.show(wordCounts.count.toInt)
   }
 }
-

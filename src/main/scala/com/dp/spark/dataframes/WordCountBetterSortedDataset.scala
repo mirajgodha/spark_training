@@ -1,17 +1,17 @@
-package com.dp.spark
+package com.dp.spark.dataframes
 
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{explode, lower, split}
 
-/** Count up how many of each word occurs in a book, using regular expressions. */
-object WordCountBetterDataset {
+/** Count up how many of each word occurs in a book, using regular expressions and sorting the final results */
+object WordCountBetterSortedDataset {
 
   case class Book(value: String)
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -20,7 +20,6 @@ object WordCountBetterDataset {
       .builder
       .appName("WordCount")
       .master("local[*]")
-      .config("spark.sql.warehouse.dir", "file:///C:/temp") // Necessary to work around a Windows bug in Spark 2.0.0; omit if you're not on Windows.
       .getOrCreate()
 
     // Read each line of my book into an Dataset
@@ -30,6 +29,7 @@ object WordCountBetterDataset {
     // Split using a regular expression that extracts words
     val words = input
       .select(explode(split($"value", "\\W+")).alias("word"))
+      .filter($"word" =!= "")
 
     // Normalize everything to lowercase
     val lowercaseWords = words.select(lower($"word").alias("word"))
@@ -37,8 +37,22 @@ object WordCountBetterDataset {
     // Count up the occurrences of each word
     val wordCounts = lowercaseWords.groupBy("word").count()
 
+    // Sort by counts
+    val wordCountsSorted = wordCounts.sort("count")
+
     // Show the results.
-    wordCounts.show(wordCounts.count.toInt)
+    wordCountsSorted.show(wordCountsSorted.count.toInt)
+
+
+    // ANOTHER WAY TO DO IT (Blending RDD's and Datasets)
+    val bookRDD = spark.sparkContext.textFile("data/book.txt")
+    val wordsRDD = bookRDD.flatMap(x => x.split("\\W+"))
+    val wordsDS = wordsRDD.toDS()
+
+    val lowercaseWordsDS = wordsDS.select(lower($"value").alias("word"))
+    val wordCountsDS = lowercaseWordsDS.groupBy("word").count()
+    val wordCountsSortedDS = wordCountsDS.sort("count")
+    wordCountsSortedDS.show(wordCountsSortedDS.count.toInt)
+
   }
 }
-

@@ -3,6 +3,11 @@ package com.dp.spark.rdd
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 
+/**
+ * Count up how many times each value (rating) occurs
+ * and print them in as
+ * Sort the resulting map of (rating, count) tuples
+ */
 object RatingsCounter {
 
   /** Our main function where the action happens */
