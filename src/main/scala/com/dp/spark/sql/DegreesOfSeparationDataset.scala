@@ -1,4 +1,4 @@
-package com.dp.spark.dataframes
+package com.dp.spark.sql
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.functions._

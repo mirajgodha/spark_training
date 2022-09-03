@@ -1,11 +1,11 @@
-package com.dp.spark.dataframes
+package com.dp.spark.sql
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{explode, lower, split}
+import org.apache.spark.sql.functions.{explode, split}
 
-/** Count up how many of each word occurs in a book, using regular expressions. */
-object WordCountBetterDataset {
+/** Count up how many of each word appears in a book as simply as possible. */
+object WordCountDataset {
 
   case class Book(value: String)
 
@@ -27,15 +27,13 @@ object WordCountBetterDataset {
     import spark.implicits._
     val input = spark.read.text("data/book.txt").as[Book]
 
-    // Split using a regular expression that extracts words
+    // Split into words separated by a space character
     val words = input
-      .select(explode(split($"value", "\\W+")).alias("word"))
-
-    // Normalize everything to lowercase
-    val lowercaseWords = words.select(lower($"word").alias("word"))
+      .select(explode(split($"value", " ")).alias("word"))
+      .filter($"word" =!= "")
 
     // Count up the occurrences of each word
-    val wordCounts = lowercaseWords.groupBy("word").count()
+    val wordCounts = words.groupBy("word").count()
 
     // Show the results.
     wordCounts.show(wordCounts.count.toInt)

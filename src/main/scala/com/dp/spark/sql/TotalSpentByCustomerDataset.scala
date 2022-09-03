@@ -1,9 +1,9 @@
-package com.dp.spark
+package com.dp.spark.sql
 
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{round, sum}
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StructType}
-import org.apache.spark.sql.functions._
 
 /** Compute the total amount spent per customer in some fake e-commerce data. */
 object TotalSpentByCustomerDataset {
@@ -12,7 +12,7 @@ object TotalSpentByCustomerDataset {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -34,7 +34,7 @@ object TotalSpentByCustomerDataset {
       .schema(customerOrdersSchema)
       .csv("data/customer-orders.csv")
       .as[CustomerOrders]
-    
+
     val totalByCustomer = customerDS
       .groupBy("cust_id")
       .agg(round(sum("amount_spent"), 2)
@@ -43,4 +43,3 @@ object TotalSpentByCustomerDataset {
     totalByCustomer.show(totalByCustomer.count.toInt)
   }
 }
-

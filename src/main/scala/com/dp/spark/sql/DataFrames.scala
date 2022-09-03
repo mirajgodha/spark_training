@@ -1,11 +1,19 @@
-package com.dp.spark.dataframes
+package com.dp.spark.sql
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 
-object DataFramesDataset {
+object DataFrames {
 
-  case class Person(id: Int, name: String, age: Int, friends: Int)
+  case class Person(ID: Int, name: String, age: Int, numFriends: Int)
+
+  def mapper(line: String): Person = {
+    val fields = line.split(',')
+
+    val person: Person = Person(fields(0).toInt, fields(1), fields(2).toInt, fields(3).toInt)
+
+    person
+  }
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
@@ -18,16 +26,14 @@ object DataFramesDataset {
       .builder
       .appName("SparkSQL")
       .master("local[*]")
+      .config("spark.sql.warehouse.dir", "file:///C:/temp") // Necessary to work around a Windows bug in Spark 2.0.0; omit if you're not on Windows.
       .getOrCreate()
 
     // Convert our csv file to a DataSet, using our Person case
     // class to infer the schema.
     import spark.implicits._
-    val people = spark.read
-      .option("header", "true")
-      .option("inferSchema", "true")
-      .csv("data/fakefriends.csv")
-      .as[Person]
+    val lines = spark.sparkContext.textFile("data/fakefriends.csv")
+    val people = lines.map(mapper).toDS().cache()
 
     // There are lots of other ways to make a DataFrame.
     // For example, spark.read.json("json file path")
