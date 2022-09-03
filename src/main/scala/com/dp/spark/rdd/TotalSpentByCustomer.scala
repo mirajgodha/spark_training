@@ -4,7 +4,9 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 
 /** Class Exercise
- * Compute the total amount spent per customer in some fake e-commerce data.
+ * Compute the total amount spent per customer in e-commerce data - customer-orders.csv
+ * columns in file as follows
+ * cust id, order id, order value
  * */
 object TotalSpentByCustomer {
 
