@@ -24,6 +24,7 @@ object KafkaReader {
       .master("local[*]")
       .getOrCreate()
 
+    spark.sparkContext.setLogLevel("WARN")
     import spark.implicits._
 
     val kafkaInputDS = spark
