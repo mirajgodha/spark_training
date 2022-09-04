@@ -1,8 +1,8 @@
-package com.dp.spark
+package com.dp.spark.streaming
 
-import org.apache.log4j._
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{col, current_timestamp, regexp_extract, window}
 
 /** Find the movies with the most ratings. */
 object TopURLs {
@@ -10,7 +10,7 @@ object TopURLs {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -32,12 +32,12 @@ object TopURLs {
 
     // Apply these regular expressions to create structure from the unstructured text
     val logsDF = accessLines.select(regexp_extract(col("value"), hostExp, 1).alias("host"),
-    regexp_extract(col("value"), timeExp, 1).alias("timestamp"),
-    regexp_extract(col("value"), generalExp, 1).alias("method"),
-    regexp_extract(col("value"), generalExp, 2).alias("endpoint"),
-    regexp_extract(col("value"), generalExp, 3).alias("protocol"),
-    regexp_extract(col("value"), statusExp, 1).cast("Integer").alias("status"),
-    regexp_extract(col("value"), contentSizeExp, 1).cast("Integer").alias("content_size"))
+      regexp_extract(col("value"), timeExp, 1).alias("timestamp"),
+      regexp_extract(col("value"), generalExp, 1).alias("method"),
+      regexp_extract(col("value"), generalExp, 2).alias("endpoint"),
+      regexp_extract(col("value"), generalExp, 3).alias("protocol"),
+      regexp_extract(col("value"), statusExp, 1).cast("Integer").alias("status"),
+      regexp_extract(col("value"), contentSizeExp, 1).cast("Integer").alias("content_size"))
 
     val logsDF2 = logsDF.withColumn("eventTime", current_timestamp())
 
@@ -57,6 +57,5 @@ object TopURLs {
     // Stop the session
     spark.stop()
   }
-  
-}
 
+}
