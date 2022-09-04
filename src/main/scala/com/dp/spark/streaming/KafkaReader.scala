@@ -8,6 +8,18 @@ import org.apache.spark.sql.functions.{struct, to_json, _}
 import org.apache.spark.sql.types.{StringType, _}
 
 
+/**
+ * To run the command run the following things:
+ * sbt package
+ * ../../spark-3.3.0-bin-hadoop3/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0 --class com.dp.spark.streaming.KafkaReader target/scala-2.12/sparkscalacourse_2.12-0.1.jar
+ *
+ * Running kafka Consumer
+ * bin/kafka-console-consumer.sh --topic test --from-beginning --bootstrap-server localhost:9092
+ *
+ * Running Kafka Producer
+ *
+ * bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
+ */
 /** Read data from kafka topic */
 object KafkaReader {
 
