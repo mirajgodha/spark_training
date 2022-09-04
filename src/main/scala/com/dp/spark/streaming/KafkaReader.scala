@@ -41,6 +41,7 @@ object KafkaReader {
       ).as[SimpleSongAggregationKafka]
 
     kafkaInputDS
+      .select(to_json(struct($"*")).cast(StringType).alias("value"))
       .writeStream
       .queryName("Debug Stream Kafka")
       .format("console")
