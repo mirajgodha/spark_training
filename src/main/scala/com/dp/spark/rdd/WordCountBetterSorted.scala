@@ -28,7 +28,7 @@ object WordCountBetterSorted {
     val wordCounts = lowercaseWords.map(x => (x, 1)).reduceByKey((x, y) => x + y)
 
     // Flip (word, count) tuples to (count, word) and then sort by key (the counts)
-    val wordCountsSorted = wordCounts.map(x => (x._2, x._1)).sortByKey()
+    val wordCountsSorted = wordCounts.map(x => (x._2, x._1)).sortByKey(false)
 
     // Print the results, flipping the (count, word) results to word: count as we go.
     for (result <- wordCountsSorted) {

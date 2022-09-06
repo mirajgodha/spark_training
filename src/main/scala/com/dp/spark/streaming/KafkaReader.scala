@@ -19,6 +19,11 @@ import org.apache.spark.sql.types.{StringType, _}
  * Running Kafka Producer
  *
  * bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
+ *
+ * First use the data/structured_streaming/streaming_data.json file on producer to show the things
+ *
+ * Read the data slowly from the data files and dump to kafa
+ * perl -pe "system 'sleep .5'" /home/hadoop/code/spark_training/data/structured_streaming/part* | bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
  */
 /** Read data from kafka topic */
 object KafkaReader {
