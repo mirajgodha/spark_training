@@ -11,6 +11,10 @@ import scala.io.{Codec, Source}
 
 object MovieRecommendationsALS {
 
+  /**
+   * To run pass the user id
+   * ../../spark-3.3.0-bin-hadoop3/bin/spark-submit --class com.dp.spark.ml.MovieRecommendationsALS target/scala-2.12/sparkscalacourse_2.12-0.1.jar 260
+   */
   /** Load up a Map of movie IDs to movie names. */
   def loadMovieNames(): Map[Int, String] = {
 

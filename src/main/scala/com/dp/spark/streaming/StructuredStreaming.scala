@@ -4,7 +4,12 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, regexp_extract}
 
-/** Find the movies with the most ratings. */
+/** Find the movies with the most ratings.
+ * Once you start the program
+ * Copy the access_logs.txt file to data directory for the program to read.
+ * The copy the same file again, and you see the data count is doubled
+ * */
+
 object StructuredStreaming {
 
 

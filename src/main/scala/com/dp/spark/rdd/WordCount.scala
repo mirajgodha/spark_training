@@ -22,6 +22,8 @@ object WordCount {
     val words = input.flatMap(x => x.split(" "))
 
     // Count up the occurrences of each word
+    //This method should only be used if the resulting map is expected to be small, as
+    //the whole thing is loaded into the driver's memory.
     val wordCounts = words.countByValue()
 
     // Print the results.
