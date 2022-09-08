@@ -1,24 +1,24 @@
-package com.dp.spark.sql
+package com.dp.spark.ml
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.linalg.Vectors
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.{DoubleType, StructType}
 
-object LinearRegressionDataFrameDataset {
+object LinearRegressionDataFrame {
 
-  case class RegressionSchema(label: Double, features_raw: Double)
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
 
+    // Use new SparkSession interface in Spark 2.0
     val spark = SparkSession
       .builder
       .appName("LinearRegressionDF")
       .master("local[*]")
+      .config("spark.sql.warehouse.dir", "file:///C:/temp") // Necessary to work around a Windows bug in Spark 2.0.0; omit if you're not on Windows.
       .getOrCreate()
 
     // Load up our page speed / amount spent data in the format required by MLLib
@@ -28,22 +28,17 @@ object LinearRegressionDataFrameDataset {
     // "feature" is the data you are given to make a prediction with. So in this example
     // the "labels" are the first column of our data, and "features" are the second column.
     // You can have more than one "feature" which is why a vector is required.
-    val regressionSchema = new StructType()
-      .add("label", DoubleType, nullable = true)
-      .add("features_raw", DoubleType, nullable = true)
+    val inputLines = spark.sparkContext.textFile("data/regression.txt")
+    val data = inputLines.map(_.split(",")).map(x => (x(0).toDouble, Vectors.dense(x(1).toDouble)))
 
+    // Convert this RDD to a DataFrame
     import spark.implicits._
-    val dsRaw = spark.read
-      .option("sep", ",")
-      .schema(regressionSchema)
-      .csv("data/regression.txt")
-      .as[RegressionSchema]
+    val colNames = Seq("label", "features")
+    val df = data.toDF(colNames: _*)
 
-    val assembler = new VectorAssembler().
-      setInputCols(Array("features_raw")).
-      setOutputCol("features")
-    val df = assembler.transform(dsRaw)
-      .select("label", "features")
+    // Note, there are lots of cases where you can avoid going from an RDD to a DataFrame.
+    // Perhaps you're importing data from a real database. Or you are using structured streaming
+    // to get your data.
 
     // Let's split our data into training data and testing data
     val trainTest = df.randomSplit(Array(0.5, 0.5))
@@ -68,7 +63,7 @@ object LinearRegressionDataFrameDataset {
     // This basically adds a "prediction" column to our testDF dataframe.
 
     // Extract the predictions and the "known" correct labels.
-    val predictionAndLabel = fullPredictions.select("prediction", "label").collect()
+    val predictionAndLabel = fullPredictions.select("prediction", "label").rdd.map(x => (x.getDouble(0), x.getDouble(1)))
 
     // Print out the predicted and actual values for each point
     for (prediction <- predictionAndLabel) {

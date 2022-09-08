@@ -1,7 +1,7 @@
-package com.dp.spark
+package com.dp.spark.sql
 
-import org.apache.spark.sql._
-import org.apache.log4j._
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{IntegerType, LongType, StructType}
 
 /** Count up how many of each star rating exists in the MovieLens 100K data set. */
