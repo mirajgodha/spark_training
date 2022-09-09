@@ -72,17 +72,17 @@ object KafkaReader {
       "radioCount.count" +
       " from global_temp.radio")
 
-    val counts = spark.sql("select sum(radioCount.count) , radioCount.artist from global_temp.radio group by radioCount.artist " )
+//    val counts = spark.sql("select sum(radioCount.count) , radioCount.artist from global_temp.radio group by radioCount.artist " )
 
     radioDataCols.writeStream
     .queryName("Debug Stream Kafka")
     .format("console")
     .start()
 
-    counts.writeStream
-      .queryName("Count of different artists")
-      .format("console")
-      .start()
+//    counts.writeStream
+//      .queryName("Count of different artists")
+//      .format("console")
+//      .start()
 
     //Wait for all streams to finish
     spark.streams.awaitAnyTermination()
