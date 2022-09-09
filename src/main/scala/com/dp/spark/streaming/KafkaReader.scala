@@ -57,9 +57,30 @@ object KafkaReader {
         from_json($"value".cast(StringType), KafkaService.schemaOutput) //From binary to JSON object
       ).as[SimpleSongAggregationKafka]
 
-    kafkaInputDS
-      .writeStream
-      .queryName("Debug Stream Kafka")
+    println("By default we get all these columns with the stream............")
+    kafkaInputDS.printSchema()
+
+    val radioData = kafkaInputDS.select("radioCount")
+    println("Just selecting our radioCount column............")
+    radioData.printSchema
+
+    radioData.createOrReplaceGlobalTempView("radio")
+
+    val radioDataCols = spark.sql("select radioCount.title, " +
+      "radioCount.artist," +
+      "radioCount.radio," +
+      "radioCount.count" +
+      " from global_temp.radio")
+
+    val counts = spark.sql("select sum(radioCount.count) , radioCount.artist from global_temp.radio group by radioCount.artist " )
+
+    radioDataCols.writeStream
+    .queryName("Debug Stream Kafka")
+    .format("console")
+    .start()
+
+    counts.writeStream
+      .queryName("Count of different artists")
       .format("console")
       .start()
 
