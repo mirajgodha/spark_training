@@ -1,8 +1,8 @@
-package com.dp.spark
+package com.dp.spark.sql
 
-import org.apache.log4j._
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.desc
 import org.apache.spark.sql.types.{IntegerType, LongType, StructType}
 
 /** Find the movies with the most ratings. */
@@ -13,10 +13,10 @@ object PopularMoviesDataset {
 
   /** Our main function where the action happens */
   def main(args: Array[String]) {
-   
+
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
-    
+
     // Use new SparkSession interface in Spark 2.0
     val spark = SparkSession
       .builder
@@ -39,7 +39,7 @@ object PopularMoviesDataset {
       .schema(moviesSchema)
       .csv("data/ml-100k/u.data")
       .as[Movie]
-    
+
     // Some SQL-style magic to sort all movies by popularity in one line!
     val topMovieIDs = moviesDS.groupBy("movieID").count().orderBy(desc("count"))
 
@@ -49,6 +49,5 @@ object PopularMoviesDataset {
     // Stop the session
     spark.stop()
   }
-  
-}
 
+}

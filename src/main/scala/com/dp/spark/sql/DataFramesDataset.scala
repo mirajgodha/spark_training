@@ -22,6 +22,8 @@ object DataFramesDataset {
 
     // Convert our csv file to a DataSet, using our Person case
     // class to infer the schema.
+    //If you remove .as[Person] it will become a DataFrame
+    //Code will run nothing changes in code even then
     import spark.implicits._
     val people = spark.read
       .option("header", "true")
