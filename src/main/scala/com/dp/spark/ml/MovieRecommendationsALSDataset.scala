@@ -7,10 +7,15 @@ import org.apache.spark.sql.{Row, SparkSession}
 
 import scala.collection.mutable
 
+/**
+ * Recommending movies for a user
+ * Passing a new user id 0 from args
+ * Have defined 2 movies for him and ratings, try changing the movies in u.data file
+ * and see how new movies are recommended for the user
+ */
 object MovieRecommendationsALSDataset {
 
   case class MoviesNames(movieId: Int, movieTitle: String)
-
   // Row format to feed into ALS
   case class Rating(userID: Int, movieID: Int, rating: Float)
 
@@ -20,7 +25,6 @@ object MovieRecommendationsALSDataset {
 
     result.movieTitle
   }
-
   /** Our main function where the action happens */
   def main(args: Array[String]) {
 
@@ -80,9 +84,14 @@ object MovieRecommendationsALSDataset {
     val model = als.fit(ratings)
 
     // Get top-10 recommendations for the user we specified
-    val userID: Int = args(0).toInt
+    val userID:Int = args(0).toInt
     val users = Seq(userID).toDF("userID")
     val recommendations = model.recommendForUserSubset(users, 10)
+
+    // Display them (oddly, this is the hardest part!)
+    println("\nCurrent movies rated by user ID " + userID + ":")
+    val currentRatings = ratings.filter(ratings("userID") === userID)
+    currentRatings.foreach(x => println(getMovieName(namesList, x.movieID) + " , " + x.rating))
 
     // Display them (oddly, this is the hardest part!)
     println("\nTop 10 recommendations for user ID " + userID + ":")
