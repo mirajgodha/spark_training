@@ -76,7 +76,7 @@ object MovieRecommendationsALSDataset {
 
     val als = new ALS()
       .setMaxIter(5)
-      .setRegParam(0.01)
+      .setRegParam(0.01) //specifies the regularization parameter in ALS (defaults to 1.0).
       .setUserCol("userID")
       .setItemCol("movieID")
       .setRatingCol("rating")
